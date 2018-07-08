@@ -15,15 +15,21 @@ class App extends Component {
       todos: []
     };
 
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSumitForm = this.handleSumitForm.bind(this);
     this.handleCheckboxCheck = this.handleCheckboxCheck.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   componentDidMount() {
     this.props.getTodo();
-    
+    this.pingTodo();
+  }
+  pingTodo() {
+    setInterval(() => {
+      this.props.getTodo();
+    }, 2000);
+  }
+
+  componentWillUnmount() {
+    this.pingTodo;
   }
 
   handleCheckboxCheck(index, complete) {
@@ -40,25 +46,6 @@ class App extends Component {
       .then(response => {
         this.setState({ todos: oldState });
       });
-  }
-
-  handleInputChange(e) {
-    this.setState({ message: e.target.value });
-  }
-
-  handleSumitForm(e) {
-    e.preventDefault();
-    let oldState = this.state.todos;
-    let todoLength = this.state.todos.length;
-    let lastId = this.state.todos[todoLength - 1].id;
-    let message = {
-      id: lastId + 1,
-      name: this.state.message,
-      complete: false
-    };
-    axios.post(`https://nookwarit-server.herokuapp.com/todos`, message);
-    oldState.push(message);
-    this.setState({ todos: oldState, message: "" });
   }
 
   render() {
@@ -79,11 +66,7 @@ class App extends Component {
           handleCheckboxCheck={this.handleCheckboxCheck}
           todos={this.state.todos}
         />
-        <FormSumit
-          message={this.state.message}
-          handleInputChange={this.handleInputChange}
-          handleSumitForm={this.handleSumitForm}
-        />
+        <FormSumit />
       </div>
     );
   }
@@ -93,7 +76,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
   addTodo: message => dispatch(addTodo(message)),
-  getTodo: () =>dispatch(getTodo())
+  getTodo: () => dispatch(getTodo())
 });
 export default connect(
   mapStateToProps,
